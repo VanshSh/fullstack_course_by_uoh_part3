@@ -1,6 +1,25 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
+const jsonParser = function (req, res, next) {
+  console.log(JSON.stringify(req.body));
+  next();
+};
 app.use(express.json());
+
+const logger = morgan(function (tokens, req, res) {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, "content-length"),
+    "-",
+    tokens["response-time"](req, res),
+    "ms",
+    JSON.stringify(req.body),
+  ].join(" ");
+});
+app.use(logger);
 
 let persons = [
   {
@@ -55,6 +74,32 @@ app.delete("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
   persons = persons.filter((person) => person.id !== id);
   res.status(204).end();
+});
+
+// To add a new person
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+app.post("/api/persons", (req, res) => {
+  const body = req.body;
+  const nameExists = persons.find((person) => person.name === body.name);
+  if (!body.name || !body.number) {
+    res.status(400).json({
+      error: "content missing",
+    });
+  } else if (nameExists) {
+    res.status(400).json({
+      error: "name must be unique",
+    });
+  } else {
+    const newPerson = {
+      id: getRandomInt(100000000),
+      name: body.name,
+      number: body.number,
+    };
+    persons = persons.concat(newPerson);
+    res.json(newPerson);
+  }
 });
 
 const PORT = 3001;
