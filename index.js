@@ -43,6 +43,12 @@ app.get("/info", (req, res) => {
 app.get("/api/persons/:id", (req, res) => {
   const params = req.params.id;
   const person = persons.find((person) => person.id === Number(params));
+  if (person) {
+    res.json(person);
+  } else {
+    res.status(404).end();
+  }
+  console.log("😇 L-47 in index.js=> ", person);
 });
 
 const PORT = 3001;
