@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-const persons = [
+let persons = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -27,14 +27,14 @@ const persons = [
 
 // To get all the data of the persons
 app.get("/api/persons", (req, res) => {
-  res.json(person);
+  res.json(persons);
 });
 
 // To send the data for the info page
 app.get("/info", (req, res) => {
   const date = new Date();
   res.send(
-    `<p>Phonebook has info for ${person.length} people</p>
+    `<p>Phonebook has info for ${persons.length} people</p>
     <p>${date}</p>`
   );
 });
@@ -48,7 +48,13 @@ app.get("/api/persons/:id", (req, res) => {
   } else {
     res.status(404).end();
   }
-  console.log("😇 L-47 in index.js=> ", person);
+});
+
+// To delete a person
+app.delete("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  persons = persons.filter((person) => person.id !== id);
+  res.status(204).end();
 });
 
 const PORT = 3001;
