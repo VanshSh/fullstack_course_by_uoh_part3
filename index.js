@@ -1,10 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
-const jsonParser = function (req, res, next) {
-  console.log(JSON.stringify(req.body));
-  next();
-};
+
 app.use(express.json());
 
 const logger = morgan(function (tokens, req, res) {
